@@ -1,0 +1,304 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Testing
+/coverage
+*.lcov
+.nyc_output
+
+# Next.js
+/.next/
+/out/
+/build
+.next
+out
+build
+
+# Production
+dist/
+*.tsbuildinfo
+
+# Misc
+.DS_Store
+*.pem
+Thumbs.db
+desktop.ini
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local env files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Note: .env.example should be committed (it's a template)
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+prisma/migrations/
+
+# IDE
+.vscode/
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+.turbo
+
+# Configuration files
+.editorconfig
+.npmrc
+.nvmrc
+.specstory
+.cursorignore
+.cursorindexingignore
+
+# AI-generated documentation
+AI_M/
+
+# AI-generated temporary scripts
+AI_S/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Temporary scripts
+create-env-example.sh
+create-env-example.py
+fix-*.sh
+resolve-*.sh
+push-*.sh
+reset-git-history.sh
+setup-github-auth.sh
+push-updates-final.sh
+push-all.sh
+
+# Python Distribution / packaging
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ForexSmartBot specific
+*.db
+*.sqlite
+*.sqlite3
+settings.json
+/data/
+backups/
+temp/
+
+# Trading data
+trades_*.csv
+trades_*.json
+trades_*.xlsx
+backtest_*.json
+strategy_test_report.md
+
+# Windows
+*.lnk
+
+# macOS
+*.dmg
+
+# Linux
+*.deb
+*.rpm
+*.tar.gz
+*.AppImage
+
+# Build artifacts
+*.exe
+*.msi
+
+# Temporary files
+*.bak
+*.backup
+
+# Project-specific temporary files
+*_SUMMARY.md
+*_FIXES*.md
+*_VERIFICATION*.md
+*_CONFIGURATION*.md
+*_SYSTEM*.md
+*_CONSISTENCY*.md
+*_CRITICAL*.md
+*_FINAL*.md
+*_NOTES*.md
+*_ENHANCED*.md
+*_COMPLETE*.md
+*_PRODUCTION*.md
+*_NEXT*.md
+*_IMPROVEMENTS*.md
+*_ERROR*.md
+*_CRASH*.md
+*_BACKTEST*.md
+*_STRATEGY*.md
+*_EXPORT*.md
+*_LANGUAGE*.md
+*_POWERSHELL*.md
+*_PROJECT*.md
+*_IMPLEMENTATION*.md
+*_DOCUMENTATION*.md
+*_COMPLETION*.md
+*_FIX*.md
+*_PNL*.md
+*_SELECTION*.md
+
+# Temporary Python scripts
+test_*.py
+update_*.py
+add_*.py
+fix_*.py
+verify_*.py
+cleanup_*.py
+*_test.py
+*_temp.py
+*_temp_*.py
+
+# Build scripts (keep only essential ones)
+build_*.py
+build_*.sh
+build_*.bat
+!build_simple.py
+
+# Documentation duplicates
+docs/wiki/placeholder.md

@@ -1,0 +1,16 @@
+{
+  "name": "SupervisorTrainer Command Center",
+  "short_name": "SupervisorAI",
+  "description": "AI Trading Command Center — 19 Models, Live Signals",
+  "start_url": "./command_center.html",
+  "display": "standalone",
+  "background_color": "#0d0f14",
+  "theme_color": "#00d4ff",
+  "orientation": "any",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["finance", "productivity"],
+  "screenshots": []
+}

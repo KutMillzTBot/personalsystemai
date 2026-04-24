@@ -1,0 +1,159 @@
+================================================================
+  SUPERVISORTRAINER — MQL5 EDITION
+  Complete Setup & Startup Commands
+================================================================
+
+----------------------------------------------------------------
+  STEP 1 — INSTALL PYTHON DEPENDENCIES
+----------------------------------------------------------------
+
+  Windows (CMD or PowerShell):
+  > pip install -r requirements.txt
+
+  Mac / Linux:
+  $ pip install -r requirements.txt
+
+  OR one-liner (no requirements file needed):
+  > pip install yfinance vaderSentiment scikit-learn gymnasium numpy pandas scipy flask plotly
+
+  Verify everything installed:
+  > pip list | findstr -i "flask yfinance sklearn vader"   (Windows)
+  $ pip list | grep -i "flask yfinance sklearn vader"      (Mac/Linux)
+
+----------------------------------------------------------------
+  STEP 2 — START THE PYTHON BRIDGE SERVER
+----------------------------------------------------------------
+
+  Navigate to your project folder first:
+  > cd path\to\your\project\folder
+
+  Then run:
+  > python mq5_bridge_server.py
+
+  You should see:
+  ===================================================
+    🚀 MQ5 Bridge Server
+    Listening on http://127.0.0.1:5050
+  ===================================================
+
+  ⚠️  KEEP THIS TERMINAL OPEN — it must run alongside MT5.
+  ⚠️  First startup takes ~60 seconds (AI models training).
+
+----------------------------------------------------------------
+  STEP 3 — METATRADER 5 SETTINGS (one time only)
+----------------------------------------------------------------
+
+  1. Open MetaTrader 5
+  2. Go to:  Tools → Options → Expert Advisors
+  3. Tick:   ✅ Allow algorithmic trading
+  4. Tick:   ✅ Allow WebRequest for listed URL
+  5. Click + and add:   http://127.0.0.1:5050
+  6. Click OK
+
+----------------------------------------------------------------
+  STEP 4 — ATTACH THE EA TO A CHART
+----------------------------------------------------------------
+
+  1. In MetaTrader 5 Navigator panel:
+     Expert Advisors → SupervisorEA → drag onto chart
+
+  2. In the EA settings popup:
+     ServerURL     = http://127.0.0.1:5050   (default)
+     TradingSymbol = leave blank (uses chart symbol)
+     LotSize       = 0.01  (start small!)
+     SignalInterval= 60    (check AI every 60 seconds)
+     BuyThreshold  = 0.60
+     SellThreshold = 0.40
+     SendFeedback  = true  (EA teaches the AI from results)
+
+  3. Click OK — you should see a smiley face ☺ on the chart
+     meaning the EA is active.
+
+  4. Check the Experts tab at the bottom for:
+     [SupervisorEA] Initialised on XAUUSD
+     [SupervisorEA] Bridge: http://127.0.0.1:5050
+
+----------------------------------------------------------------
+  STEP 5 — VERIFY IT IS WORKING
+----------------------------------------------------------------
+
+  Open your browser and visit:
+    http://127.0.0.1:5050/health
+    → {"status":"running","symbols":["EURUSD"]}
+
+    http://127.0.0.1:5050/signal?symbol=EURUSD
+    → {"action":1,"score":0.63,"signal":"BUY",...}
+
+    http://127.0.0.1:5050/status?symbol=EURUSD
+    → shows model weights and accuracy
+
+----------------------------------------------------------------
+  USEFUL COMMANDS (run in terminal while server is running)
+----------------------------------------------------------------
+
+  Force retrain all models:
+  > curl -X POST "http://127.0.0.1:5050/retrain?symbol=EURUSD"
+
+  Get signal for crypto:
+  > curl "http://127.0.0.1:5050/signal?symbol=BTCUSD"
+
+  Get signal for gold:
+  > curl "http://127.0.0.1:5050/signal?symbol=XAUUSD"
+
+  Get signal for indices:
+  > curl "http://127.0.0.1:5050/signal?symbol=NAS100"
+
+  Check server health:
+  > curl "http://127.0.0.1:5050/health"
+
+  Windows (no curl): paste the URL directly in your browser.
+
+----------------------------------------------------------------
+  SYMBOL MAP (MT5 symbol → yfinance auto-mapping)
+----------------------------------------------------------------
+
+  EURUSD  →  EURUSD=X      BTCUSD  →  BTC-USD
+  GBPUSD  →  GBPUSD=X      ETHUSD  →  ETH-USD
+  USDJPY  →  JPY=X         XAUUSD  →  GC=F  (Gold)
+  NAS100  →  ^NDX           US500   →  ^GSPC
+  AAPL    →  AAPL           TSLA    →  TSLA
+
+----------------------------------------------------------------
+  AUTOSTART ON WINDOWS (optional — runs server on PC startup)
+----------------------------------------------------------------
+
+  Create a shortcut to this command in your Startup folder:
+  > python C:\path\to\mq5_bridge_server.py
+
+  Or use a .bat file:
+    @echo off
+    cd /d C:\path\to\project
+    python mq5_bridge_server.py
+    pause
+
+  Windows Startup folder location:
+  > shell:startup   (paste in Windows Run box)
+
+----------------------------------------------------------------
+  TROUBLESHOOTING
+----------------------------------------------------------------
+
+  EA shows "Bridge unreachable":
+  → Make sure mq5_bridge_server.py is running
+  → Check firewall is not blocking port 5050
+  → Confirm WebRequest URL added in MT5 options
+
+  EA shows "0 errors" but no trades:
+  → Score may be in HOLD zone (0.40–0.60)
+  → Lower BuyThreshold or raise SellThreshold in EA inputs
+  → Check Experts tab for signal scores
+
+  Server crashes on startup:
+  → Run: pip install flask --upgrade
+  → Check Python version: python --version  (need 3.9+)
+
+  First signal takes too long:
+  → Normal — AI trains on first symbol request (~60 sec)
+  → Subsequent requests are instant
+
+================================================================
