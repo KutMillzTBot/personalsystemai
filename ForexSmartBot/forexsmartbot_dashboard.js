@@ -1,5 +1,25 @@
 const params = new URLSearchParams(window.location.search);
-const BRIDGE = String(params.get("bridge") || "http://127.0.0.1:5050").replace(/\/+$/, "");
+
+function readBridgeMetaPreset() {
+  const meta = document.querySelector('meta[name="default-bridge"]');
+  return String(meta?.getAttribute("content") || "").trim();
+}
+
+function inferBridgeFromHost() {
+  const host = String(window.location.hostname || "").toLowerCase();
+  const protocol = String(window.location.protocol || "https:");
+  if (host === "127.0.0.1" || host === "localhost") return "http://127.0.0.1:5050";
+  if (host.endsWith(".trycloudflare.com")) return `${protocol}//${window.location.host}`;
+  return "";
+}
+
+const BRIDGE = String(
+  params.get("bridge") ||
+  readBridgeMetaPreset() ||
+  inferBridgeFromHost() ||
+  localStorage.getItem("fsb_bridge_url") ||
+  "http://127.0.0.1:5050"
+).replace(/\/+$/, "");
 
 const $ = id => document.getElementById(id);
 const set = (id, value) => {
@@ -91,9 +111,24 @@ async function fetchJson(url) {
   return res.json();
 }
 
+function getSupervisorUrl() {
+  const target = new URL("../index.html", window.location.href);
+  target.searchParams.set("bridge", BRIDGE);
+  return target.toString();
+}
+
+function copyText(value, successText) {
+  navigator.clipboard.writeText(value).then(() => {
+    set("fsb-status-text", successText);
+  }).catch(() => {
+    set("fsb-status-text", "Copy failed, but the link is still shown above.");
+  });
+}
+
 async function refresh() {
   set("fsb-bridge-url", BRIDGE);
-  const supervisorLink = `../command_center.html?bridge=${encodeURIComponent(BRIDGE)}`;
+  localStorage.setItem("fsb_bridge_url", BRIDGE);
+  const supervisorLink = getSupervisorUrl();
   const link = $("fsb-open-supervisor");
   if (link) link.href = supervisorLink;
 
@@ -144,6 +179,10 @@ async function refresh() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   $("fsb-refresh-btn")?.addEventListener("click", refresh);
+  $("fsb-copy-bridge-btn")?.addEventListener("click", () => copyText(BRIDGE, "Bridge URL copied."));
+  $("fsb-copy-page-btn")?.addEventListener("click", () => copyText(window.location.href, "Page URL copied."));
+  $("fsb-open-deriv-btn")?.addEventListener("click", () => window.open("https://charts.deriv.com/deriv", "_blank", "noopener"));
+  $("fsb-open-github-btn")?.addEventListener("click", () => window.open("https://github.com/KutMillzTBot/personalsystemai", "_blank", "noopener"));
   await refresh();
   setInterval(refresh, 5000);
 });

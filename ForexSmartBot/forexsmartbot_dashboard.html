@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="default-bridge" content="" />
   <title>ForexSmartBot Mobile Console</title>
   <link rel="stylesheet" href="./forexsmartbot_dashboard.css" />
 </head>
@@ -21,7 +22,7 @@
         </p>
         <div class="hero-actions">
           <button class="primary-btn" id="fsb-refresh-btn" type="button">Refresh Snapshot</button>
-          <a class="ghost-btn" id="fsb-open-supervisor" href="../command_center.html" target="forexsmartbot_dashboard.html" rel="noreferrer">Open Supervisor</a>
+          <a class="ghost-btn" id="fsb-open-supervisor" href="../index.html" target="_blank" rel="noreferrer">Open Supervisor</a>
         </div>
       </div>
       <section class="hero-side">
@@ -113,7 +114,7 @@
           </div>
         </div>
         <div class="launch-stack">
-          <a class="launch-tile" href="../command_center.html" target="_blank" rel="noreferrer">
+          <a class="launch-tile" href="../index.html" target="_blank" rel="noreferrer">
             <span class="launch-label">Supervisor</span>
             <strong>Main Command Center</strong>
             <p>Open the full dashboard if you want chart controls, models, and integrations in one place.</p>
@@ -148,6 +149,33 @@
         </div>
         <div id="fsb-positions" class="mini-stack">
           <div class="note-card">No open positions yet.</div>
+        </div>
+      </article>
+
+      <article class="panel dark">
+        <div class="panel-head">
+          <div>
+            <div class="panel-kicker">Command Deck</div>
+            <h2>Quick Actions</h2>
+          </div>
+        </div>
+        <div class="action-grid">
+          <button class="action-tile" id="fsb-copy-bridge-btn" type="button">
+            <span>Copy Bridge</span>
+            <strong>Share Phone Link</strong>
+          </button>
+          <button class="action-tile" id="fsb-copy-page-btn" type="button">
+            <span>Copy Page URL</span>
+            <strong>Cloud Launch Link</strong>
+          </button>
+          <button class="action-tile" id="fsb-open-deriv-btn" type="button">
+            <span>Chart Access</span>
+            <strong>Open Deriv Chart</strong>
+          </button>
+          <button class="action-tile" id="fsb-open-github-btn" type="button">
+            <span>Repo</span>
+            <strong>Open GitHub Project</strong>
+          </button>
         </div>
       </article>
 

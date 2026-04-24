@@ -14,12 +14,33 @@ const STORAGE = {
   chartTemplate: "supervisor_chart_template_v1",
 };
 
+function readBridgeMetaPreset() {
+  const meta = document.querySelector('meta[name="default-bridge"]');
+  return String(meta?.getAttribute("content") || "").trim();
+}
+
+function inferBridgeFromHost() {
+  const host = String(window.location.hostname || "").toLowerCase();
+  const protocol = String(window.location.protocol || "https:");
+  if (host === "127.0.0.1" || host === "localhost") return DEFAULT_BRIDGE;
+  if (host.endsWith(".trycloudflare.com")) return `${protocol}//${window.location.host}`;
+  return "";
+}
+
+function resolveInitialBridge() {
+  return (
+    params.get("bridge") ||
+    window.BRIDGE_URL ||
+    localStorage.getItem(STORAGE.bridge) ||
+    readBridgeMetaPreset() ||
+    inferBridgeFromHost() ||
+    DEFAULT_BRIDGE
+  );
+}
+
 const params = new URLSearchParams(window.location.search);
 let BRIDGE = safeNormalizeBridge(
-  params.get("bridge") ||
-  window.BRIDGE_URL ||
-  localStorage.getItem(STORAGE.bridge) ||
-  DEFAULT_BRIDGE
+  resolveInitialBridge()
 );
 
 let currentSymbol = (localStorage.getItem(STORAGE.symbol) || "V75").toUpperCase();
@@ -244,6 +265,24 @@ function buildDerivChartUrl(symbol) {
   if (!u.pathname || u.pathname === "/") u.pathname = "/deriv";
   u.searchParams.set("symbol", mapped);
   return u.toString();
+}
+
+function isLocalStaticHost() {
+  const host = String(window.location.hostname || "").toLowerCase();
+  return host === "127.0.0.1" || host === "localhost";
+}
+
+function getSupervisorEntryPath() {
+  const path = String(window.location.pathname || "").toLowerCase();
+  if (path.endsWith("/index.html") || path === "/" || path.endsWith("/")) return "./index.html";
+  return "./command_center.html";
+}
+
+function getForexSmartBotStandaloneUrl() {
+  if (isLocalStaticHost()) {
+    return `http://127.0.0.1:8080/forexsmartbot_dashboard.html?bridge=${encodeURIComponent(BRIDGE)}`;
+  }
+  return `./ForexSmartBot/forexsmartbot_dashboard.html?bridge=${encodeURIComponent(BRIDGE)}`;
 }
 
 function renderDerivChart(symbol) {
@@ -1079,7 +1118,7 @@ function initIntegrationsPanel() {
 function syncForexSmartBotSection() {
   const frame = $("forexsmartbot-frame");
   const link = $("forexsmartbot-open-link");
-  const src = `http://127.0.0.1:8080/forexsmartbot_dashboard.html?bridge=${encodeURIComponent(BRIDGE)}`;
+  const src = getForexSmartBotStandaloneUrl();
   if (frame && frame.dataset.src !== src) {
     frame.dataset.src = src;
     frame.src = src;

@@ -9,6 +9,7 @@
   --accent: #6ce0ff;
   --accent-2: #7affb8;
   --accent-3: #ffcf6a;
+  --accent-4: #73a9ff;
   --danger: #ff7890;
   --shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
   --radius: 24px;
@@ -70,7 +71,9 @@ body {
   gap: 18px;
   padding: 22px;
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(8, 16, 27, 0.88), rgba(11, 21, 35, 0.92));
+  background:
+    radial-gradient(circle at top right, rgba(115, 169, 255, 0.18), transparent 28%),
+    linear-gradient(180deg, rgba(8, 16, 27, 0.88), rgba(11, 21, 35, 0.92));
   backdrop-filter: blur(18px);
 }
 
@@ -202,7 +205,20 @@ h1 {
 .snap-card {
   padding: 18px;
   border-radius: 20px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  background:
+    linear-gradient(180deg, var(--panel), var(--panel-2));
+  position: relative;
+  overflow: hidden;
+}
+
+.snap-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -20px -30px auto;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(108, 224, 255, 0.18), transparent 65%);
+  pointer-events: none;
 }
 
 .snap-card.mini {
@@ -229,7 +245,18 @@ h1 {
 .panel {
   border-radius: 24px;
   padding: 20px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  background:
+    linear-gradient(180deg, var(--panel), var(--panel-2));
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent 55%);
+  pointer-events: none;
 }
 
 .panel.glass { grid-column: span 7; }
@@ -364,6 +391,45 @@ h1 {
   word-break: break-word;
 }
 
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.action-tile {
+  appearance: none;
+  border: 1px solid rgba(117, 185, 255, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+  color: var(--text);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.action-tile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(122, 255, 184, 0.28);
+  background: linear-gradient(180deg, rgba(122,255,184,0.08), rgba(255,255,255,0.03));
+}
+
+.action-tile span {
+  display: block;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.action-tile strong {
+  display: block;
+  font-size: 18px;
+}
+
 .detail-card {
   padding: 16px;
 }
@@ -429,6 +495,10 @@ h1 {
   }
 
   .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-grid {
     grid-template-columns: 1fr;
   }
 }
