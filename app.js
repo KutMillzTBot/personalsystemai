@@ -761,7 +761,7 @@ async function loadPositions() {
   tb.innerHTML = Object.entries(data).map(([tid, t]) => {
     const pnl = Number(t.pnl || 0);
     const type = String(t.type || "BUY").toUpperCase();
-    return `<tr><td>${tid}</td><td><b>${t.symbol || "?"}</b></td><td><span class="badge ${type.toLowerCase()}">${type}</span></td><td>${t.lot || 0}</td><td>${Number(t.entry || 0).toFixed(5)}</td><td>${Number(t.sl || 0).toFixed(5)} / ${Number(t.tp || 0).toFixed(5)}</td><td class="${cls(pnl)}">${sgn(pnl)}${fmtUsd(pnl)}</td></tr>`;
+    return `<tr><td>${tid}</td><td><b>${t.symbol || "?"}</b></td><td><span class="badge ${type.toLowerCase()}">${type}</span></td><td>${t.lot || 0}</td><td>${Number(t.entry || 0).toFixed(5)}</td><td>${Number(t.sl || 0).toFixed(5)} / ${Number(t.tp || 0).toFixed(5)}</td><td class="${cls(pnl)}">${sgn(pnl)}${fmtUsd(pnl)}</td><td><button class="btn btn-danger btn-sm" data-close-ticket="${tid}">Close</button></td></tr>`;
   }).join("");
   renderChartPositions(data);
 }
@@ -775,14 +775,14 @@ function renderChartPositions(data) {
   );
 
   if (!entries.length) {
-    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:18px;color:#888">No open trades for this chart symbol</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:18px;color:#888">No open trades for this chart symbol</td></tr>';
     return;
   }
 
   tb.innerHTML = entries.map(([tid, t]) => {
     const pnl = Number(t.pnl || 0);
     const type = String(t.type || "BUY").toUpperCase();
-    return `<tr><td>${tid}</td><td><span class="badge ${type.toLowerCase()}">${type}</span></td><td>${Number(t.entry || 0).toFixed(5)}</td><td>${Number(t.sl || 0).toFixed(5)}</td><td>${Number(t.tp || 0).toFixed(5)}</td><td class="${cls(pnl)}">${sgn(pnl)}${fmtUsd(pnl)}</td></tr>`;
+    return `<tr><td>${tid}</td><td><span class="badge ${type.toLowerCase()}">${type}</span></td><td>${Number(t.entry || 0).toFixed(5)}</td><td>${Number(t.sl || 0).toFixed(5)}</td><td>${Number(t.tp || 0).toFixed(5)}</td><td class="${cls(pnl)}">${sgn(pnl)}${fmtUsd(pnl)}</td><td><button class="btn btn-danger btn-sm" data-close-ticket="${tid}">Close</button></td></tr>`;
   }).join("");
 }
 
@@ -918,6 +918,82 @@ async function loadServerLog() {
   }
 }
 
+async function loadIntegrationStatus() {
+  const data = await api("/integrations/status");
+  if (!data) return;
+  set("int-telegram-status", data.telegram_configured ? "READY" : "SET TOKEN");
+  set("int-voice-status", data.voice_available ? "READY" : "MISSING");
+  set("int-vision-status", data.vision_available ? "READY" : "MISSING");
+  set("int-synthetic-status", data.synthetic_ready ? "READY" : "OFF");
+}
+
+function renderSyntheticRows(rows) {
+  const tb = $("synthetic-tbody");
+  if (!tb) return;
+  if (!rows || !rows.length) {
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#888">No synthetic runs yet.</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map(row =>
+    `<tr><td>${row.run}</td><td>${row.trades}</td><td>${fmtPct(row.win_rate)}</td><td class="${cls(row.roi)}">${row.roi.toFixed(2)}%</td><td>${row.max_dd.toFixed(2)}%</td><td>${fmtUsd(row.ending_balance)}</td><td>${row.bias}</td></tr>`
+  ).join("");
+}
+
+function initIntegrationsPanel() {
+  $("voice-send-btn")?.addEventListener("click", async () => {
+    const text = $("voice-text-input")?.value?.trim() || "";
+    if (!text) return;
+    set("voice-output", "Sending voice prompt...");
+    const res = await post("/integrations/voice/chat", { text });
+    set("voice-output", res?.reply || res?.error || "No reply");
+  });
+
+  $("vision-run-btn")?.addEventListener("click", async () => {
+    const symbol = $("vision-symbol-input")?.value || currentSymbol;
+    const timeframe = $("vision-timeframe-input")?.value || "M15";
+    set("vision-output", "Analyzing structure...");
+    const res = await post("/integrations/vision/structure", { symbol, timeframe, count: 120 });
+    if (!res) {
+      set("vision-output", "No response from vision integration.");
+      return;
+    }
+    if (res.error) {
+      set("vision-output", res.error);
+      return;
+    }
+    const events = res.events || [];
+    if (!events.length) {
+      set("vision-output", `No structure events found for ${symbol} ${timeframe}.`);
+      return;
+    }
+    set("vision-output", events.map(e => `${e.pattern} | ${e.direction} | ${(Number(e.confidence || 0) * 100).toFixed(1)}% | t=${e.time}`).join("\n"));
+  });
+
+  $("synthetic-run-btn")?.addEventListener("click", async () => {
+    const symbol = $("synthetic-symbol-input")?.value || currentSymbol;
+    const runs = Number($("synthetic-runs-input")?.value || 8);
+    const days = Number($("synthetic-days-input")?.value || 30);
+    const seed = Number($("synthetic-seed-input")?.value || 4242);
+    renderSyntheticRows([]);
+    const res = await post("/synthetic/run", { symbol, runs, days, seed });
+    renderSyntheticRows(res?.scenarios || []);
+  });
+
+  const bindTicketCloser = containerId => {
+    $(containerId)?.addEventListener("click", async event => {
+      const btn = event.target.closest("[data-close-ticket]");
+      if (!btn) return;
+      const ticket = btn.getAttribute("data-close-ticket");
+      const res = await post("/trades/close_ticket", { ticket });
+      addLog(res?.queued_mt ? `Close queued for ticket ${ticket}` : `Close requested for ticket ${ticket}`, "info");
+      setTimeout(() => refreshAll({ forceHeavy: true }), 600);
+    });
+  };
+
+  bindTicketCloser("positions-tbody");
+  bindTicketCloser("chart-positions-tbody");
+}
+
 function syncForexSmartBotSection() {
   const frame = $("forexsmartbot-frame");
   const link = $("forexsmartbot-open-link");
@@ -955,6 +1031,7 @@ async function refreshAll({ forceHeavy = false } = {}) {
         loadWeights(),
         loadBacktest(),
         loadServerLog(),
+        loadIntegrationStatus(),
       ]);
       lastHeavyRefreshAt = now;
     }
@@ -990,7 +1067,10 @@ async function doAction(action) {
   };
 
   if (map[action]) {
-    await map[action]();
+    const res = await map[action]();
+    if (action === "close-all" && res) {
+      addLog(res.queued_mt ? "Close-all queued to MT bridge" : `Closed ${res.closed || 0} trades`, "info");
+    }
     setTimeout(refreshAll, 500);
   }
 }
@@ -1207,6 +1287,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindBridgeDisplay();
   initModelModal();
   initManualTradingPanel();
+  initIntegrationsPanel();
   syncForexSmartBotSection();
 
   document.querySelectorAll("[data-action]").forEach(b => {
