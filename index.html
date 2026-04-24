@@ -54,6 +54,7 @@
 
     <div class="sidebar-section-label">System</div>
     <div class="sidebar-item" data-section="section-control"><span class="si-icon">🎮</span>Control</div>
+    <div class="sidebar-item" data-section="section-integrations"><span class="si-icon">🛰️</span>Integrations</div>
     <div class="sidebar-item" data-section="section-settings"><span class="si-icon">⚙️</span>Settings</div>
     <div class="sidebar-item" data-section="section-results"><span class="si-icon">🧾</span>Results CSV</div>
     <div class="sidebar-item" data-section="section-log"><span class="si-icon">🖥️</span>Log</div>
@@ -191,14 +192,14 @@
         </div>
         <div class="card" style="margin-top:12px">
           <div class="card-header"><div class="card-title">Trades On This Chart Symbol</div></div>
-          <div class="table-wrap"><table class="data-table"><thead><tr><th>Ticket</th><th>Type</th><th>Entry</th><th>SL</th><th>TP</th><th>P&amp;L</th></tr></thead><tbody id="chart-positions-tbody"></tbody></table></div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>Ticket</th><th>Type</th><th>Entry</th><th>SL</th><th>TP</th><th>P&amp;L</th><th>Action</th></tr></thead><tbody id="chart-positions-tbody"></tbody></table></div>
         </div>
       </div>
     </section>
 
     <section id="section-positions" class="section">
       <div class="card"><div class="card-header"><div class="card-title">Open Positions</div><button class="btn btn-danger btn-sm" data-action="close-all">Close All</button></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Ticket</th><th>Symbol</th><th>Type</th><th>Lot</th><th>Entry</th><th>SL / TP</th><th>P&amp;L</th></tr></thead><tbody id="positions-tbody"></tbody></table></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Ticket</th><th>Symbol</th><th>Type</th><th>Lot</th><th>Entry</th><th>SL / TP</th><th>P&amp;L</th><th>Action</th></tr></thead><tbody id="positions-tbody"></tbody></table></div>
       </div>
     </section>
 
@@ -253,6 +254,51 @@
       <div class="card"><div class="card-header"><div class="card-title">Trading Control</div></div><div class="btn-row"><button class="btn btn-primary" data-action="start-trading">Start</button><button class="btn btn-danger" data-action="stop-trading">Stop</button><button class="btn btn-ghost" data-action="pause">Pause</button><button class="btn btn-ghost" data-action="resume">Resume</button></div></div>
       <div class="card"><div class="card-header"><div class="card-title">Mode</div></div><div class="btn-row"><button class="btn btn-primary" data-action="mode-auto">Full Auto</button><button class="btn btn-ghost" data-action="mode-semi">Signal Only</button><button class="btn btn-ghost" data-action="mode-off">Off</button></div></div>
     </div></section>
+
+    <section id="section-integrations" class="section">
+      <div class="grid-4">
+        <div class="stat-tile"><div class="stat-tile-val" id="int-telegram-status">-</div><div class="stat-tile-label">Telegram</div></div>
+        <div class="stat-tile"><div class="stat-tile-val" id="int-voice-status">-</div><div class="stat-tile-label">Voice</div></div>
+        <div class="stat-tile"><div class="stat-tile-val" id="int-vision-status">-</div><div class="stat-tile-label">Vision</div></div>
+        <div class="stat-tile"><div class="stat-tile-val" id="int-synthetic-status">-</div><div class="stat-tile-label">Synthetic Lab</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Voice Interface</div></div>
+          <div class="subtle-note">Connected to the copied `voice_interface` module and ready for Telegram/assistant commands.</div>
+          <div class="form-group"><label class="form-label">Prompt</label><input class="form-input" id="voice-text-input" type="text" placeholder="hey rich give me a market briefing" /></div>
+          <div class="btn-row"><button class="btn btn-primary" id="voice-send-btn">Send Voice Prompt</button></div>
+          <pre class="integration-output" id="voice-output">No voice reply yet.</pre>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Vision Structure</div></div>
+          <div class="subtle-note">Uses the copied market structure engine to read candles and return BOS, MSS, OB, FVG and sweep events.</div>
+          <div class="grid-2 compact-grid">
+            <div class="form-group"><label class="form-label">Symbol</label><input class="form-input" id="vision-symbol-input" type="text" value="XAUUSD" /></div>
+            <div class="form-group"><label class="form-label">Timeframe</label><input class="form-input" id="vision-timeframe-input" type="text" value="M15" /></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" id="vision-run-btn">Analyze Structure</button></div>
+          <pre class="integration-output" id="vision-output">No structure events yet.</pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Synthetic Lab</div></div>
+        <div class="subtle-note">Run multiple synthetic scenario passes to compare outcome ranges before pushing live changes.</div>
+        <div class="grid-4 compact-grid">
+          <div class="form-group"><label class="form-label">Symbol</label><input class="form-input" id="synthetic-symbol-input" type="text" value="XAUUSD" /></div>
+          <div class="form-group"><label class="form-label">Runs</label><input class="form-input" id="synthetic-runs-input" type="number" value="8" /></div>
+          <div class="form-group"><label class="form-label">Days</label><input class="form-input" id="synthetic-days-input" type="number" value="30" /></div>
+          <div class="form-group"><label class="form-label">Seed</label><input class="form-input" id="synthetic-seed-input" type="number" value="4242" /></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" id="synthetic-run-btn">Run Synthetic Lab</button></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Run</th><th>Trades</th><th>Win Rate</th><th>ROI</th><th>Max DD</th><th>Ending Balance</th><th>Bias</th></tr></thead>
+            <tbody id="synthetic-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
     <section id="section-settings" class="section">
       <div class="grid-2">
